@@ -1,0 +1,23 @@
+# Coze Adapter Docker Override Additions
+# This file contains the additions to the LibreChat Docker override (docker-compose.override.yml) 
+# to add the Coze Adapter to the LibreChat Docker container.
+
+
+services:
+  coze_adapter:
+    container_name: coze_adapter
+    build:
+      context: ./coze_adapter
+      dockerfile: Dockerfile.coze_adapter
+    ports:
+      - "${COZE_ADAPTER_PORT}:${COZE_ADAPTER_PORT}"
+    environment:
+      - COZE_API_KEY=${COZE_API_KEY}
+      - COZE_API_URL=${COZE_API_URL}
+      - COZE_ADAPTER_PORT=${COZE_ADAPTER_PORT}
+      - COZE_BOT_ID=${COZE_BOT_ID}
+      - COZE_BOT_NAME=${COZE_BOT_NAME}
+    volumes:
+      - ./coze_adapter:/app
+      - ./.env:/app/.env 
+    command: node coze_adapter.js

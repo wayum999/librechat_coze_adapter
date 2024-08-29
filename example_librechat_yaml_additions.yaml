@@ -1,0 +1,25 @@
+#===============================================================================#
+# Add the configuration below to extend your LibreChat server with Coze Adapter #
+#===============================================================================#
+
+
+#=================#
+# ENDPOINTS       #
+#=================#
+
+endpoints:
+  custom:
+    - name: "Coze"  # Changed to a more descriptive name
+      baseURL: "http://host.docker.internal:2222/v1"  # Updated to use the Docker host
+      apiKey: "${COZE_API_KEY}"  # Corrected the key name to 'apiKey'
+      models:
+        default: ["${COZE_BOT_NAME}"]  # Default bot
+        fetch: false  # Fetch models not supported by Coze Adapter
+      titleConvo: false  # Title conversation, recommended to be true if you have a title model like OpenAI
+      titleModel: "${COZE_BOT_NAME}"  # Title model
+      summarize: false  # Summarize, recommended to be true if you have a summary model like OpenAI
+      summaryModel: "${COZE_BOT_NAME}"  # Summary model (OpenAI or similar recommended)
+      forcePrompt: false  # Force prompt
+      modelDisplayLabel: "${COZE_BOT_NAME}"  # Model display label
+      userIdQuery: true  # Support user ID query
+      iconURL: "https://i.imgur.com/pnEk38v.png"  # Added icon URL for the custom endpoint

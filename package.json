@@ -1,0 +1,23 @@
+{
+  "name": "coze_adapter",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "coze_adapter.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "start": "node -r dotenv/config coze_adapter.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "axios": "^1.7.5",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}
