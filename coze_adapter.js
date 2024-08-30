@@ -5,6 +5,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import FormData from 'form-data';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -37,8 +38,47 @@ const COZE_BOT_ID = process.env.COZE_BOT_ID;
 function escapeJsonString(s) {
   return JSON.stringify(s).slice(1, -1);
 }
+// Upload an image to Coze
+async function uploadImageToCoze(base64Image, filename) {
+  try {
+    // console.log('Received base64Image:', base64Image);
 
-// Make an external API call with streaming response
+    // Create a buffer from the base64 data
+    const buffer = Buffer.from(base64Image, 'base64');
+
+    // Prepare form data
+    const formData = new FormData();
+    formData.append('file', buffer, {
+      filename: filename, // Use the dynamically provided filename
+      contentType: `image/${filename.split('.').pop()}`, // Set the content type based on the extension
+    });
+
+    // Configure axios request
+    const response = await axios({
+      method: 'POST',
+      url: `${COZE_API_URL}/v1/files/upload`,
+      headers: {
+        Authorization: `Bearer ${COZE_API_KEY}`,
+        ...formData.getHeaders(), // Include headers from formData
+      },
+      data: formData,
+    });
+
+    console.log('Upload successful:', response.data);
+    if (response.data && response.data.code === 0) {
+      return response.data.data.id; // Return file ID on success
+    } else {
+      throw new Error(`Failed to upload image - code: ${response.data.code}, message: ${response.data.msg}`);
+    }
+  } catch (error) {
+    console.error(`Error uploading image to Coze: ${error.message}`);
+    throw new Error('Failed to upload image');
+  }
+}
+//#endregion HELPER FUNCTIONS
+
+//#region API CALLS
+// Make an external API call with streaming response to Coze
 async function callExternalApiWithStreaming(payload, res) {
   console.debug(`Calling external API with payload: ${JSON.stringify(payload, null, 2)}`);
   try {
@@ -127,14 +167,47 @@ async function callExternalApiWithStreaming(payload, res) {
     }
   }
 }
-//#endregion HELPER FUNCTIONS
+//#endregion API CALLS
 
 //#region ROUTES
-// Chat completion endpoint
 app.post('/v1/chat/completions', async (req, res) => {
   console.log(`Received chat completion request: ${JSON.stringify(req.body)}`);
   try {
     const { messages = [], stream = true, user = 'default_user' } = req.body;
+    // console.log(`Received chat completion request...MESSAGES: ${JSON.stringify(messages)}`);
+
+    // Process messages to handle images
+    for (const message of messages) {
+      // console.log(`Processing message: ${JSON.stringify(message)}`);
+      if (message.content && Array.isArray(message.content)) {
+        for (const contentItem of message.content) {
+          // console.log(`Processing content item: ${JSON.stringify(contentItem)}`);
+          if (
+            contentItem.type === 'image_url' &&
+            contentItem.image_url &&
+            contentItem.image_url.url
+          ) {
+            const base64Image = contentItem.image_url.url.split(',')[1];
+            const mimeType = contentItem.image_url.url.match(/data:(.*?);base64,/)[1];
+            const fileExtension = mimeType.split('/')[1]; // Extract the extension (e.g., jpeg, png)
+
+            // Dynamically set the filename, assuming the original filename is unknown
+            const filename = `uploaded_image.${fileExtension}`;
+            // console.log(`Uploading image to Coze...BASE64 IMAGE BEFORE UPLOAD: ${base64Image}, FILENAME: ${filename}`);
+
+            const fileId = await uploadImageToCoze(base64Image, filename);
+            // console.log(`Uploaded image to Coze...FILE ID: ${fileId}`);
+            contentItem.type = 'image';
+            contentItem.file_id = fileId;
+            delete contentItem.image_url;
+          }
+        }
+        // console.log(`Message after processing: ${JSON.stringify(message)}`);
+        // Convert the content array to a JSON string
+        message.content = JSON.stringify(message.content);
+        message.content_type = 'object_string';
+      }
+    }
 
     // Prepare payload for Coze API
     const cozePayload = {
@@ -147,13 +220,6 @@ app.post('/v1/chat/completions', async (req, res) => {
     };
 
     console.debug(`Coze API request payload: ${JSON.stringify(cozePayload, null, 2)}`);
-
-    // Set response headers for SSE
-    res.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-    });
 
     // Call external API with streaming
     await callExternalApiWithStreaming(cozePayload, res);
