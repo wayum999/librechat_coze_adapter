@@ -30,7 +30,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Set the Coze API key, URL, and bot ID from environment variables
 const COZE_API_KEY = process.env.COZE_API_KEY;
 const COZE_API_URL = process.env.COZE_API_URL;
-const COZE_BOT_ID = process.env.COZE_BOT_ID;
+const COZE_BOT_ID_CODEMAN = process.env.COZE_BOT_ID_CODEMAN;
 //#endregion ENVIRONMENT VARIABLES
 
 //#region HELPER FUNCTIONS
@@ -38,35 +38,43 @@ const COZE_BOT_ID = process.env.COZE_BOT_ID;
 function escapeJsonString(s) {
   return JSON.stringify(s).slice(1, -1);
 }
+
+function extractMimeTypeAndBase64(imageUrl) {
+  const matches = imageUrl.match(/^data:(image\/[a-zA-Z0-9+]+);base64,(.*)$/);
+  if (matches && matches.length === 3) {
+    return { mimeType: matches[1], base64Data: matches[2] };
+  } else {
+    console.error('Failed to extract MIME type or base64 data. Defaulting to image/jpeg.');
+    return { mimeType: 'image/jpeg', base64Data: imageUrl.split(',')[1] };
+  }
+}
+
 // Upload an image to Coze
-async function uploadImageToCoze(base64Image, filename) {
+async function uploadImageToCoze(base64Image, mimeType) {
   try {
-    // console.log('Received base64Image:', base64Image);
-
-    // Create a buffer from the base64 data
     const buffer = Buffer.from(base64Image, 'base64');
+    const extension = mimeType.split('/')[1]; // Extract the extension from the MIME type
+    const filename = `uploaded_image.${extension}`;
 
-    // Prepare form data
     const formData = new FormData();
     formData.append('file', buffer, {
-      filename: filename, // Use the dynamically provided filename
-      contentType: `image/${filename.split('.').pop()}`, // Set the content type based on the extension
+      filename: filename,
+      contentType: mimeType,
     });
 
-    // Configure axios request
     const response = await axios({
       method: 'POST',
       url: `${COZE_API_URL}/v1/files/upload`,
       headers: {
         Authorization: `Bearer ${COZE_API_KEY}`,
-        ...formData.getHeaders(), // Include headers from formData
+        ...formData.getHeaders(),
       },
       data: formData,
     });
 
     console.log('Upload successful:', response.data);
     if (response.data && response.data.code === 0) {
-      return response.data.data.id; // Return file ID on success
+      return response.data.data.id;
     } else {
       throw new Error(`Failed to upload image - code: ${response.data.code}, message: ${response.data.msg}`);
     }
@@ -84,7 +92,7 @@ async function callExternalApiWithStreaming(payload, res) {
   try {
     const response = await axios.post(`${COZE_API_URL}/v3/chat`, payload, {
       headers: {
-        'Authorization': `Bearer ${COZE_API_KEY}`,
+        Authorization: `Bearer ${COZE_API_KEY}`,
         'Content-Type': 'application/json',
       },
       responseType: 'stream',
@@ -94,17 +102,17 @@ async function callExternalApiWithStreaming(payload, res) {
     let buffer = '';
     response.data.on('data', (chunk) => {
       buffer += chunk.toString();
-      console.log(`Buffer: ${buffer}`);
+      // console.log(`Buffer: ${buffer}`);
       let processBuffer = buffer.split('\n\n');
       buffer = processBuffer.pop();
 
-      processBuffer.forEach(eventData => {
+      processBuffer.forEach((eventData) => {
         console.log(`Event data: ${eventData}`);
         if (eventData.trim()) {
           try {
             const lines = eventData.split('\n');
-            const eventLine = lines.find(l => l.startsWith('event:'));
-            const dataLine = lines.find(l => l.startsWith('data:'));
+            const eventLine = lines.find((l) => l.startsWith('event:'));
+            const dataLine = lines.find((l) => l.startsWith('data:'));
 
             if (eventLine && dataLine) {
               const event = eventLine.substring(6).trim();
@@ -119,7 +127,9 @@ async function callExternalApiWithStreaming(payload, res) {
                 case 'conversation.message.delta':
                   if (data.role === 'assistant' && data.type === 'answer') {
                     const content = escapeJsonString(data.content || '');
-                    res.write(`data: {"choices": [{"delta": {"content": "${content}"}, "index": 0}]}\n\n`);
+                    res.write(
+                      `data: {"choices": [{"delta": {"content": "${content}"}, "index": 0}]}\n\n`,
+                    );
                   }
                   break;
                 case 'conversation.message.completed':
@@ -129,10 +139,16 @@ async function callExternalApiWithStreaming(payload, res) {
                       name: functionCallContent.name || 'unknown_function',
                       arguments: JSON.stringify(functionCallContent.arguments || {}),
                     };
-                    res.write(`data: {"choices": [{"delta": {"function_call": ${JSON.stringify(functionCall)}}, "index": 0}]}\n\n`);
+                    res.write(
+                      `data: {"choices": [{"delta": {"function_call": ${JSON.stringify(
+                        functionCall,
+                      )}}, "index": 0}]}\n\n`,
+                    );
                   } else if (data.type === 'tool_output') {
                     const toolOutput = escapeJsonString(data.content || '');
-                    res.write(`data: {"choices": [{"delta": {"content": "${toolOutput}"}, "index": 0}]}\n\n`);
+                    res.write(
+                      `data: {"choices": [{"delta": {"content": "${toolOutput}"}, "index": 0}]}\n\n`,
+                    );
                   }
                   break;
                 case 'conversation.chat.completed':
@@ -140,7 +156,9 @@ async function callExternalApiWithStreaming(payload, res) {
                     const tokenInput = data.usage?.input_count || 0;
                     const tokenOutput = data.usage?.output_count || 0;
                     const tokenTotal = data.usage?.token_count || 0;
-                    console.log(`COZE TOKEN USAGE DATA: Input: ${tokenInput}, Output: ${tokenOutput}, Total: ${tokenTotal}`);
+                    console.log(
+                      `COZE TOKEN USAGE DATA: Input: ${tokenInput}, Output: ${tokenOutput}, Total: ${tokenTotal}`,
+                    );
                     res.write('data: [DONE]\n\n');
                   }
                   break;
@@ -159,7 +177,6 @@ async function callExternalApiWithStreaming(payload, res) {
         res.end();
       }
     });
-
   } catch (error) {
     console.error(`Error calling external API: ${error}`);
     if (!res.writableEnded) {
@@ -174,36 +191,31 @@ app.post('/v1/chat/completions', async (req, res) => {
   console.log(`Received chat completion request: ${JSON.stringify(req.body)}`);
   try {
     const { messages = [], stream = true, user = 'default_user' } = req.body;
-    // console.log(`Received chat completion request...MESSAGES: ${JSON.stringify(messages)}`);
 
     // Process messages to handle images
     for (const message of messages) {
-      // console.log(`Processing message: ${JSON.stringify(message)}`);
       if (message.content && Array.isArray(message.content)) {
         for (const contentItem of message.content) {
-          // console.log(`Processing content item: ${JSON.stringify(contentItem)}`);
           if (
             contentItem.type === 'image_url' &&
             contentItem.image_url &&
             contentItem.image_url.url
           ) {
-            const base64Image = contentItem.image_url.url.split(',')[1];
-            const mimeType = contentItem.image_url.url.match(/data:(.*?);base64,/)[1];
-            const fileExtension = mimeType.split('/')[1]; // Extract the extension (e.g., jpeg, png)
+            try {
+              const { mimeType, base64Data } = extractMimeTypeAndBase64(contentItem.image_url.url);
 
-            // Dynamically set the filename, assuming the original filename is unknown
-            const filename = `uploaded_image.${fileExtension}`;
-            // console.log(`Uploading image to Coze...BASE64 IMAGE BEFORE UPLOAD: ${base64Image}, FILENAME: ${filename}`);
+              console.log(`Uploading image to Coze... MIME TYPE: ${mimeType}, BASE64 IMAGE BEFORE UPLOAD: ${base64Data}`);
 
-            const fileId = await uploadImageToCoze(base64Image, filename);
-            // console.log(`Uploaded image to Coze...FILE ID: ${fileId}`);
-            contentItem.type = 'image';
-            contentItem.file_id = fileId;
-            delete contentItem.image_url;
+              const fileId = await uploadImageToCoze(base64Data, mimeType);
+              console.log(`Uploaded image to Coze... FILE ID: ${fileId}`);
+              contentItem.type = 'image';
+              contentItem.file_id = fileId;
+              delete contentItem.image_url;
+            } catch (error) {
+              console.error(`Error processing image upload: ${error.message}`);
+            }
           }
         }
-        // console.log(`Message after processing: ${JSON.stringify(message)}`);
-        // Convert the content array to a JSON string
         message.content = JSON.stringify(message.content);
         message.content_type = 'object_string';
       }
@@ -212,7 +224,7 @@ app.post('/v1/chat/completions', async (req, res) => {
     // Prepare payload for Coze API
     const cozePayload = {
       conversation_id: '1',
-      bot_id: COZE_BOT_ID,
+      bot_id: COZE_BOT_ID_CODEMAN,
       user_id: user || 'default_user',
       additional_messages: messages,
       auto_save_history: false,
