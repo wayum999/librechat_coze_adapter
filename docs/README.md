@@ -20,6 +20,8 @@ layout:
 
 # Introduction
 
+## The Basics
+
 ### What Does It Do?
 
 In short, the \[Coze ↔ OpenAI ↔ LibreChat] Unified API Adapter facilitates the integration of the [Coze](https://www.coze.com/) API with the popular chat platform [LibreChat](https://www.librechat.ai/).&#x20;
@@ -46,6 +48,44 @@ Unfortunately, at the time of writing this, the Coze API protocol is not OpenAI-
 3. A request to the Coze API is made using the predefined settings.
 4. The response from Coze is then streamed and translated back into an OpenAI API format that LibreChat can understand.
 
-### Jump right in
+***
 
-<table data-view="cards"><thead><tr><th></th><th></th><th data-hidden data-card-cover data-type="files"></th><th data-hidden></th><th data-hidden data-card-target data-type="content-ref"></th></tr></thead><tbody><tr><td><strong>Getting Started</strong></td><td>Create your first site</td><td><a href=".gitbook/assets/1.png">1.png</a></td><td></td><td><a href="getting-started/quickstart.md">quickstart.md</a></td></tr><tr><td><strong>Basics</strong></td><td>Learn the basics of GitBook</td><td><a href=".gitbook/assets/2.png">2.png</a></td><td></td><td><a href="broken-reference">Broken link</a></td></tr><tr><td><strong>Publish your docs</strong></td><td>Share your docs online</td><td><a href=".gitbook/assets/3.png">3.png</a></td><td></td><td><a href="overview/publish-your-docs-1.md">publish-your-docs-1.md</a></td></tr></tbody></table>
+## LibreChat
+
+LibreChat is a free, open source AI chat platform. This Web UI offers vast customization, supporting numerous AI providers, services, and integrations.
+
+LibreChat's OpenAI-ish interface boasts speed and a wealth of functionality. Because of a massive collaborative effort to build the application, it consistently stays feature-rich, secure, and one of the best web applications for LLM chatting.
+
+Some of major features include:
+
+* Artifacts
+* RAG
+* Multi-Modal
+
+[View the full feature list >](https://www.librechat.ai/docs/features)
+
+***
+
+## Coze
+
+Coze is a next-generation low-code/no-code AI application and chatbot developing platform.
+
+Beginners and experts alike can rapidly prototype AI bot ideas using the multitude of tools available in the software, or they can build their own APIs and complex systems all within the comfort of the Coze interface.
+
+Some of major features include:
+
+* Feature 1
+* Feature 2
+* Feature 3
+
+### Building Chatbots
+
+### Coze API
+
+***
+
+## OpenAI Schema Protocol
+
+OpenAI has become the gold standard of LLM chatting, so it is no surprise many have adopted their request and response schema as standard protocol when building applications.
+
+{% embed url="https://platform.openai.com/docs/api-reference/chat" %}

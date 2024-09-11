@@ -3,13 +3,13 @@
 ## Overview
 
 * [Introduction](README.md)
-* [Coze](overview/publish-your-docs.md)
-* [LibreChat](overview/publish-your-docs-1.md)
-* [OpenAI](overview/openapi.md)
 
 ## Getting Started
 
-* [Quickstart](getting-started/quickstart.md)
+* [Installation](getting-started/quickstart/README.md)
+  * [LibreChat](getting-started/quickstart/librechat.md)
+  * [Coze Bots](getting-started/quickstart/coze-bots.md)
+  * [API Adapter](getting-started/quickstart/api-adapter.md)
 
 ## Basics
 
