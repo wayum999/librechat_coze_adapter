@@ -1,5 +1,5 @@
 {
-  "model": "${COZE_BOT_NAME_CODEMAN}",
+  "model": "${COZE_BOT_NAME}",
   "user": "66cbe2b7319507013116783d",
   "stream": true,
   "messages": [
