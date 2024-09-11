@@ -1,4 +1,8 @@
-# OpenAPI
+---
+icon: brain-circuit
+---
+
+# OpenAI
 
 You can sync GitBook pages with an OpenAPI or Swagger file or a URL to include auto-generated API methods in your documentation.
 
