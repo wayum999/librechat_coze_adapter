@@ -34,11 +34,20 @@ const COZE_BOT_ID_CODEMAN = process.env.COZE_BOT_ID_CODEMAN;
 //#endregion ENVIRONMENT VARIABLES
 
 //#region HELPER FUNCTIONS
-// Escape JSON strings to prevent injection
+/**
+ * Escape JSON strings to prevent injection.
+ * @param {string} s - The string to escape.
+ * @returns {string} The escaped string.
+ */
 function escapeJsonString(s) {
   return JSON.stringify(s).slice(1, -1);
 }
 
+/**
+ * Extract the MIME type and base64 data from an image URL.
+ * @param {string} imageUrl - The image URL.
+ * @returns {Object} An object containing the MIME type and base64 data.
+ */
 function extractMimeTypeAndBase64(imageUrl) {
   const matches = imageUrl.match(/^data:(image\/[a-zA-Z0-9+]+);base64,(.*)$/);
   if (matches && matches.length === 3) {
@@ -49,7 +58,12 @@ function extractMimeTypeAndBase64(imageUrl) {
   }
 }
 
-// Upload an image to Coze
+/**
+ * Upload an image to Coze.
+ * @param {string} base64Image - The base64-encoded image data.
+ * @param {string} mimeType - The MIME type of the image.
+ * @returns {Promise<string>} A promise that resolves to the uploaded file ID.
+ */
 async function uploadImageToCoze(base64Image, mimeType) {
   try {
     const buffer = Buffer.from(base64Image, 'base64');
@@ -86,7 +100,11 @@ async function uploadImageToCoze(base64Image, mimeType) {
 //#endregion HELPER FUNCTIONS
 
 //#region API CALLS
-// Make an external API call with streaming response to Coze
+/**
+ * Make an external API call with streaming response to Coze.
+ * @param {Object} payload - The payload to send to the Coze API.
+ * @param {Object} res - The Express response object.
+ */
 async function callExternalApiWithStreaming(payload, res) {
   console.debug(`Calling external API with payload: ${JSON.stringify(payload, null, 2)}`);
   try {
@@ -187,6 +205,11 @@ async function callExternalApiWithStreaming(payload, res) {
 //#endregion API CALLS
 
 //#region ROUTES
+/**
+ * Handle chat completion requests.
+ * @param {Object} req - The Express request object.
+ * @param {Object} res - The Express response object.
+ */
 app.post('/v1/chat/completions', async (req, res) => {
   console.log(`Received chat completion request: ${JSON.stringify(req.body)}`);
   try {
