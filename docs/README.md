@@ -89,3 +89,21 @@ Some of major features include:
 OpenAI has become the gold standard of LLM chatting, so it is no surprise many have adopted their request and response schema as standard protocol when building applications.
 
 {% embed url="https://platform.openai.com/docs/api-reference/chat" %}
+
+***
+
+## **Functional Highlights**
+
+* **Image Upload Handling:**
+  * Detects images within messages that are encoded as data URLs.
+  * Uploads images to the Coze API before forwarding the message.
+  * Replaces image data with a `file_id` reference to the uploaded image.
+* **Streaming Responses:**
+  * Supports streaming of responses from the Coze API to the client.
+  * Processes different event types to handle message deltas, completions, and conversation endings.
+* **Middleware Usage:**
+  * Utilizes CORS to allow cross-origin requests.
+  * Parses large payloads up to 50MB, accommodating messages with sizable content (e.g., images).
+* **Robust Error Handling:**
+  * Logs detailed error information for debugging.
+  * Provides meaningful error responses to the client.

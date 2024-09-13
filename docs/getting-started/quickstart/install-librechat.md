@@ -1,9 +1,9 @@
 ---
-description: Installing and setting up LibreChat to work with the adapter.
 icon: toolbox
+description: Installing and setting up LibreChat to work with the adapter.
 ---
 
-# LibreChat
+# Install LibreChat
 
 ## Installing LibreChat
 
@@ -21,6 +21,8 @@ The adapter will utilize three main configuration components in LibreChat:
 
 [Remote Installation >](https://www.librechat.ai/docs/remote)
 
+***
+
 ### Next Steps
 
-Once you have a LibreChat instance up and running, you can move on to the next step in the process: creating a Coze AI Chatbot. If you have one already and a Coze API key that works with it, you can skip ahead to the [adapter installation](api-adapter.md).
+Once you have a LibreChat instance up and running, you can move on to the next step in the process: creating a Coze AI Chatbot. If you have one already and a Coze API key that works with it, you can skip ahead to the [adapter installation](install-api-adapter.md).

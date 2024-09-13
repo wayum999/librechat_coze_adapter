@@ -1,9 +1,9 @@
 ---
-description: Finally, setting up the adapter.
 icon: arrow-right-arrow-left
+description: Finally, setting up the adapter.
 ---
 
-# API Adapter
+# Install API Adapter
 
 At this point, you should have an instance of LibreChat running and functional, and an API-accessible published Coze Chatbot with an API key associated with it.
 
@@ -24,7 +24,7 @@ git clone https://github.com/wayum999/librechat_coze_adapter
 #### You can then copy the entire `coze_adapter` folder to your LibreChat project root:
 
 ```
-cp coze_adapter /path/to/your/librechat
+cp librechat_coze_adapter /path/to/your/librechat
 ```
 
 #### If there are updates to the adapter, you can pull the updates to your original folder and repeat the copying process each time.
@@ -41,23 +41,21 @@ git clone https://github.com/wayum999/librechat_coze_adapter
 
 #### If there are updates to the adapter, you can pull the updates to directly to your cloned folder, just make sure you keep your repos straight as nested repos can get confusing.
 
+***
+
 ## Configuring the Adapter
 
-Navigate inside the coze\_adapter folder you just cloned:
+Navigate to the `librechat_coze_adapter` folder you just cloned:
 
 ```
-cd coze_adapter
+cd librechat_coze_adapter
 ```
 
 Here you can find the following folders and documents to guide you with the setup:
 
+***
 
-
-### Configuring LibreChat
-
-
-
-
+## Configuring LibreChat
 
 
 
