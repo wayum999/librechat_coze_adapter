@@ -30,24 +30,15 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 // Set the Coze API key, URL, and bot ID from environment variables
 const COZE_API_KEY = process.env.COZE_API_KEY;
 const COZE_API_URL = process.env.COZE_API_URL;
-const COZE_BOT_ID_CODEMAN = process.env.COZE_BOT_ID_CODEMAN;
+const COZE_BOT_ID = process.env.COZE_BOT_ID;
 //#endregion ENVIRONMENT VARIABLES
 
 //#region HELPER FUNCTIONS
-/**
- * Escape JSON strings to prevent injection.
- * @param {string} s - The string to escape.
- * @returns {string} The escaped string.
- */
+// Escape JSON strings to prevent injection
 function escapeJsonString(s) {
   return JSON.stringify(s).slice(1, -1);
 }
 
-/**
- * Extract the MIME type and base64 data from an image URL.
- * @param {string} imageUrl - The image URL.
- * @returns {Object} An object containing the MIME type and base64 data.
- */
 function extractMimeTypeAndBase64(imageUrl) {
   const matches = imageUrl.match(/^data:(image\/[a-zA-Z0-9+]+);base64,(.*)$/);
   if (matches && matches.length === 3) {
@@ -58,12 +49,7 @@ function extractMimeTypeAndBase64(imageUrl) {
   }
 }
 
-/**
- * Upload an image to Coze.
- * @param {string} base64Image - The base64-encoded image data.
- * @param {string} mimeType - The MIME type of the image.
- * @returns {Promise<string>} A promise that resolves to the uploaded file ID.
- */
+// Upload an image to Coze
 async function uploadImageToCoze(base64Image, mimeType) {
   try {
     const buffer = Buffer.from(base64Image, 'base64');
@@ -97,14 +83,11 @@ async function uploadImageToCoze(base64Image, mimeType) {
     throw new Error('Failed to upload image');
   }
 }
+
 //#endregion HELPER FUNCTIONS
 
 //#region API CALLS
-/**
- * Make an external API call with streaming response to Coze.
- * @param {Object} payload - The payload to send to the Coze API.
- * @param {Object} res - The Express response object.
- */
+// Make an external API call with streaming response to Coze
 async function callExternalApiWithStreaming(payload, res) {
   console.debug(`Calling external API with payload: ${JSON.stringify(payload, null, 2)}`);
   try {
@@ -119,8 +102,8 @@ async function callExternalApiWithStreaming(payload, res) {
 
     let buffer = '';
     response.data.on('data', (chunk) => {
+      console.debug(`Received chunk: ${chunk}`);
       buffer += chunk.toString();
-      // console.log(`Buffer: ${buffer}`);
       let processBuffer = buffer.split('\n\n');
       buffer = processBuffer.pop();
 
@@ -140,7 +123,6 @@ async function callExternalApiWithStreaming(payload, res) {
               switch (event) {
                 case 'conversation.chat.created':
                 case 'conversation.chat.in_progress':
-                  // console.log(`Chat event: ${event}`);
                   break;
                 case 'conversation.message.delta':
                   if (data.role === 'assistant' && data.type === 'answer') {
@@ -191,8 +173,16 @@ async function callExternalApiWithStreaming(payload, res) {
     });
 
     response.data.on('end', () => {
+      console.debug('Stream ended');
       if (!res.writableEnded) {
         res.end();
+      }
+    });
+
+    response.data.on('error', (error) => {
+      console.error(`Stream error: ${error.message}`);
+      if (!res.writableEnded) {
+        res.status(500).json({ error: 'Internal server error', details: error.message });
       }
     });
   } catch (error) {
@@ -202,21 +192,24 @@ async function callExternalApiWithStreaming(payload, res) {
     }
   }
 }
-//#endregion API CALLS
+//endregion API CALLS
 
-//#region ROUTES
-/**
- * Handle chat completion requests.
- * @param {Object} req - The Express request object.
- * @param {Object} res - The Express response object.
- */
+//region ROUTES
 app.post('/v1/chat/completions', async (req, res) => {
   console.log(`Received chat completion request: ${JSON.stringify(req.body)}`);
   try {
-    const { messages = [], stream = true, user = 'default_user' } = req.body;
+    const { messages = [], stream = true, user = 'default_user'} = req.body;
 
-    // Process messages to handle images
+    //region SUB SYSTEM PROMPT
+    // Process messages to handle images and substitute 'system' role
     for (const message of messages) {
+      // Check if the role is 'system' and substitute it with 'assistant'
+      if (message.role === 'system') {
+        message.role = 'assistant';
+        console.log(`Substituted 'system' role with 'assistant' in message: ${message}`);
+      }
+      //endregion SUB SYSTEM PROMPT
+
       if (message.content && Array.isArray(message.content)) {
         for (const contentItem of message.content) {
           if (
@@ -241,15 +234,25 @@ app.post('/v1/chat/completions', async (req, res) => {
         }
         message.content = JSON.stringify(message.content);
         message.content_type = 'object_string';
+      } else {
+        message.content_type = 'text';
       }
     }
+    console.log(`Messages: ${JSON.stringify(messages, null, 2)}`);
 
     // Prepare payload for Coze API
     const cozePayload = {
       conversation_id: '1',
-      bot_id: COZE_BOT_ID_CODEMAN,
+      bot_id: COZE_BOT_ID,
       user_id: user || 'default_user',
-      additional_messages: messages,
+      additional_messages: [
+        {
+          role: 'assistant', // Treat system message as assistant message
+          content: 'The user has attached a file to the conversation. Use the context to answer.',
+          content_type: 'text',
+        },
+        ...messages, // Include user messages
+      ],
       auto_save_history: false,
       stream: stream,
     };
