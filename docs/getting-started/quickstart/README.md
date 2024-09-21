@@ -1,6 +1,0 @@
----
-icon: circle-play
----
-
-# Installation
-

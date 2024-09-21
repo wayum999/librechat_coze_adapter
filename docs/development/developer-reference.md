@@ -1,11 +1,13 @@
 ---
-description: Understand the composition of the adapter to extend or customize as needed.
 icon: laptop-code
+description: Understand the composition of the adapter to extend or customize as needed.
 ---
 
-# Development
+# Developer Reference
 
-**1. Imports and Setup**
+**Sometimes you may need to customize the adapter to suit your needs. The following  is an outline of its architecture and elements.**
+
+### **Imports and Setup**
 
 * **Modules Imported:**
   * `express`: Web framework for building RESTful APIs.
@@ -29,7 +31,7 @@ const __dirname = path.dirname(__filename);
 const app = express();
 ```
 
-**2. Middleware Configuration**
+### **Middleware Configuration**
 
 * **CORS Middleware:**
 
@@ -48,7 +50,7 @@ app.use(express.urlencoded({ limit: '50mb', extended: true }));
 * Parses incoming requests with JSON and URL-encoded payloads.
 * Sets the payload size limit to 50MB.
 
-**3. Environment Variables**
+### **Environment Variables**
 
 * **API Credentials and Configuration:**
 
@@ -62,7 +64,7 @@ const COZE_BOT_ID_CODEMAN = process.env.COZE_BOT_ID_CODEMAN;
 * **`COZE_API_URL`**: Base URL for the Coze API endpoints.
 * **`COZE_BOT_ID_CODEMAN`**: Identifier for the specific bot used in conversations.
 
-**4. Helper Functions**
+### **Helper Functions**
 
 * **`escapeJsonString(s)`:**
   * Escapes special characters in a string to prevent JSON injection.
@@ -77,7 +79,7 @@ const COZE_BOT_ID_CODEMAN = process.env.COZE_BOT_ID_CODEMAN;
   * Returns the `file_id` from the Coze API upon successful upload.
   * **Purpose**: Handles image uploads to the Coze API, enabling the inclusion of images in chat messages.
 
-**5. API Call Function**
+### **API Call Function**
 
 * **`callExternalApiWithStreaming(payload, res)`:**
   * Sends a POST request to the Coze API's `/v3/chat` endpoint with the provided payload.
@@ -89,7 +91,7 @@ const COZE_BOT_ID_CODEMAN = process.env.COZE_BOT_ID_CODEMAN;
   * Writes processed data to the client response stream in a format compatible with the client's expectations.
   * **Purpose**: Bridges the streaming responses from the Coze API to the client, maintaining real-time communication.
 
-**6. Routes**
+### **Routes**
 
 * **`POST /v1/chat/completions` Endpoint:**
 
@@ -138,7 +140,7 @@ app.post('/v1/chat/completions', async (req, res) => { ... });
   * Catches and logs errors during processing.
   * Sends a 500 Internal Server Error response if an error occurs.
 
-**7. Server Startup**
+### **Server Startup**
 
 * **Port Configuration and Server Launch:**
 

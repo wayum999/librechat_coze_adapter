@@ -6,8 +6,11 @@
 
 ## Getting Started
 
-* [Installation](getting-started/quickstart/README.md)
-  * [Install LibreChat](getting-started/quickstart/install-librechat.md)
-  * [Build a Coze Bot](getting-started/quickstart/build-a-coze-bot.md)
-  * [Install API Adapter](getting-started/quickstart/install-api-adapter.md)
-* [Development](getting-started/development.md)
+* [Build a Coze Bot](getting-started/build-a-coze-bot.md)
+* [Install LibreChat](getting-started/install-librechat.md)
+* [Install API Adapter](getting-started/install-api-adapter.md)
+
+## Development
+
+* [Developer Reference](development/developer-reference.md)
+* [Contributing](development/contributing.md)
