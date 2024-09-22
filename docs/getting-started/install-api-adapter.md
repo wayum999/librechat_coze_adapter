@@ -11,29 +11,11 @@ The final step is to install the adapter itself. There are two main routes you c
 
 ## Cloning the Repository
 
-### 1. Cloning or Forking the Repository Separately
-
-Perhaps the simplest way to keep your repos organized and separate is to clone the adapter repo in a separate project from your LibreChat repo.&#x20;
-
-You can run this command from the location you want to store this project:
+Enter the project directory.
 
 ```
-git clone https://github.com/wayum999/librechat_coze_adapter
+cd LibreChat
 ```
-
-#### You can then copy the entire `coze_adapter` folder to your LibreChat project root:
-
-```
-cp librechat_coze_adapter /path/to/your/librechat
-```
-
-#### If there are updates to the adapter, you can pull the updates to your original folder and repeat the copying process each time.
-
-### 2. Cloning or Forking the Repository Within a LibreChat Repository
-
-If you prefer to keep the adapter repo nested within your LibreChat application, you can simply clone the repo from the root of your project.
-
-You can then run this command from the root:
 
 ```
 git clone https://github.com/wayum999/librechat_coze_adapter

@@ -110,6 +110,16 @@ Select Add New SSH Host and enter \<username>@\<ip address> and choose the SSH c
 
 Now you should have a terminal that is in your Droplet. At this point you can continue the process by cloning LibreChat and the adapter and modifying the configuration files.
 
+### Docker
+
+Utilize the [Docker setup instructions](https://www.librechat.ai/docs/remote/docker\_linux) in the LibreChat documentation.
+
+### Clone LibreChat
+
+```
+git clone https://github.com/danny-avila/LibreChat.git
+```
+
 ***
 
 ### Configuring LibreChat
