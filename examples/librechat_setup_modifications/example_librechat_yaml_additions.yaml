@@ -10,7 +10,7 @@
 endpoints:
   custom:
     - name: "Coze"  # Changed to a more descriptive name
-      baseURL: "http://host.docker.internal:2222/v1"  # Updated to use the Docker host
+      baseURL: "http://host.docker.internal:${COZE_ADAPTER_PORT}/v1"  # Updated to use the Docker host
       apiKey: "${COZE_API_KEY}"  # Corrected the key name to 'apiKey'
       models:
         default: ["YOUR_COZE_BOT_NAME"]  # Default bot
@@ -20,6 +20,6 @@ endpoints:
       summarize: false  # Summarize, recommended to be true if you have a summary model like OpenAI
       summaryModel: "YOUR_COZE_BOT_NAME"  # Summary model (OpenAI or similar recommended)
       forcePrompt: false  # Force prompt
-      modelDisplayLabel: "YOUR_COZE_BOT_NAME"  # Model display label
+      modelDisplayLabel: "Coze"  # Model display label
       userIdQuery: true  # Support user ID query
       iconURL: "https://i.imgur.com/pnEk38v.png"  # Added icon URL for the custom endpoint
