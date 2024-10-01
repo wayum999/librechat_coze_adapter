@@ -1,6 +1,6 @@
 ---
-description: Installing and setting up LibreChat to work with the adapter.
 icon: toolbox
+description: Installing and setting up LibreChat to work with the adapter.
 ---
 
 # Install LibreChat
@@ -28,6 +28,8 @@ Installing LIbreChat locally is a great option to test it out. If you require ac
 [Remote Installation >](https://www.librechat.ai/docs/remote)
 
 For remote installation on a server, we recommend Digital Ocean due to its reputation and intuitive interface.  Detailed installation instructions can be found below.
+
+NOTE: We recommend one level up from the most basic Dropplet that uses 1GB of memory vs. 512MB of memory. This is because the adapter is running an express server and putting a little more strain on the box.
 
 [Digital Ocean LibreChat Installation >](https://www.librechat.ai/docs/remote/digitalocean)
 
@@ -110,15 +112,27 @@ Select Add New SSH Host and enter \<username>@\<ip address> and choose the SSH c
 
 Now you should have a terminal that is in your Droplet. At this point you can continue the process by cloning LibreChat and the adapter and modifying the configuration files.
 
+***
+
 ### Docker
 
 Utilize the [Docker setup instructions](https://www.librechat.ai/docs/remote/docker\_linux) in the LibreChat documentation.
+
+***
 
 ### Clone LibreChat
 
 ```
 git clone https://github.com/danny-avila/LibreChat.git
 ```
+
+***
+
+### Custom Domains \[Optional]
+
+To link LibreChat to custom domain, we recommend using a Cloudflare tunnel. They are free and can be used with any of your domains.&#x20;
+
+For more information, check out the [Cloudflare Setup Instructions](https://www.librechat.ai/docs/remote/cloudflare) in the LibreChat documentation.
 
 ***
 
@@ -129,6 +143,8 @@ The adapter will utilize three main configuration components in LibreChat:
 1. Docker override file \[ docker-compose.override.ym l]  [More Information >](https://www.librechat.ai/docs/configuration/docker\_override)
 2. environment variables file \[ .env ]   [More Information >](https://www.librechat.ai/docs/configuration/dotenv)
 3. LibreChat YAML configuration file \[ librechat.yaml ]  [More Information >](https://www.librechat.ai/docs/configuration/librechat\_yaml)
+
+Continue to follow the LibreChat Instructions to finish the LibreChat setup.
 
 NOTE: Ensure that LibreChat is able to run independent of the adapter in the next stop. Otherwise, it will be harder to debug any issues.
 

@@ -1,6 +1,6 @@
 ---
-description: Finally, setting up the adapter.
 icon: arrow-right-arrow-left
+description: Finally, setting up the adapter.
 ---
 
 # Install API Adapter
@@ -64,7 +64,19 @@ The ones you should change the values of are:
 * COZE\_BOT\_ID: found in the URL when editing your bot.
 * COZE\_BOT\_NAME: can be any name you choose to show up in the dropdown list of LibreChat
 
+IMPORTANT: If you haven't already, for the security and safety of your site and data, ensure you replace the following variables in your .env file:
 
+* CREDS\_KEY
+* CREDS\_IV
+* JWT\_SECRET
+* JWT\_REFRESH\_SECRET
+* MEILI\_MASTER\_KEY
+
+LibreChat provides a useful [Credentials Generator](https://www.librechat.ai/toolkit/creds\_generator) for your convenience to create random strings for this purpose.&#x20;
+
+NOTE: If you haven't already, ensure that DOMAIN\_CLIENT and DOMAIN\_SERVER variables are set to your custom domain if using one.
+
+***
 
 #### `librechat.yaml`
 
@@ -99,11 +111,9 @@ The ones you should change the values of are:
 * titleModel: use the name you assiged the bot in the `.env` file that you want to use for titling.
 * summaryModel: use the name you assiged the bot in the `.env` file that you want to use for summaries.
 
-
+***
 
 `docker-compose.override.yml`
-
-
 
 Finally, you will be adding the adapter as a service in your Docker Override File , `docker-compose.override.yml` , as shown in the `example_docker_override_additions.yml` file. The additions are as follows:
 
@@ -134,10 +144,32 @@ services:
 
 You may not need to make any modifications to this since it pulls the data from your`.env` file you already edited.&#x20;
 
+***
+
 ### Adding Multiple Bots
 
 If you add multiple bots, you will have to assign a variable for its name and its ID, and then add them both to all 3 of the files above in the appropriate places.
 
+***
+
 ### Running Everything
 
 If everything is set up properly, you should be able to run LibreChat normally and you should see your added service and model(s) as options.
+
+If using Cloudflare tunneling, here is an example of a shell script you can run to set everything up and close the terminal window as it will run in the background.&#x20;
+
+NOTE:  Be sure to change `<TUNNEL_NAME>` with the name of the tunnel you set up with Cloudflare.
+
+```
+#!/bin/bash
+# Run docker compose up in the background
+nohup docker compose up -d &
+
+# Run cloudflared tunnel in the background
+nohup cloudflared tunnel run <TUNNEL_NAME> &
+
+# Ensure the script doesn't exit immediately
+wait
+```
+
+After running this, you can close your terminal window and the application should continue to be accessible from the custom domain.

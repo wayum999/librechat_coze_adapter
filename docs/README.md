@@ -37,9 +37,13 @@ Coze.com Info:
 * [User Guide](https://www.coze.com/docs/guides)
 * [API Documentation](https://www.coze.com/docs/developer\_guides/coze\_api\_overview)
 
+***
+
 ### Why Would I Want This?
 
 Unfortunately, at the time of writing this, the Coze API protocol is not OpenAI-friendly. There are certain differences it has mostly due to the fact that it needs to handle the complexities of being agentic.&#x20;
+
+***
 
 ### How Does It Work?
 
@@ -107,3 +111,19 @@ OpenAI has become the gold standard of LLM chatting, so it is no surprise many h
 * **Robust Error Handling:**
   * Logs detailed error information for debugging.
   * Provides meaningful error responses to the client.
+
+***
+
+## Getting Started
+
+To get started, this documentation will walk you through a three-step process consisting of the following:
+
+1. [Build a Coze Bot >](getting-started/build-a-coze-bot.md)
+2. [Install LibreChat >](getting-started/install-librechat.md)
+3. [Install API Adapter >](getting-started/install-api-adapter.md)
+
+It is important, especially if you are unfamiliar with these systems, to follow the process closely and not to omit anything.
+
+## Support
+
+Although there is no official support for this adapter or LibreChat, feel free to contact us through Github for assistance in setting this up for a small fee.&#x20;
